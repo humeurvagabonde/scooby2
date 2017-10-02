@@ -1,0 +1,76 @@
+
+
+
+buildscript {
+	ext {
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+	}
+
+    repositories {
+	    mavenCentral()
+	    maven { url "https://repo.spring.io/snapshot" }
+	    maven { url "https://repo.spring.io/milestone" }
+    }
+
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+	    mavenCentral()
+	    maven { url "https://repo.spring.io/snapshot" }
+	    maven { url "https://repo.spring.io/milestone" }
+    }
+
+    dependencies {
+        testCompile 'junit:junit:4.12'
+    }
+
+}
+
+project(':application') {
+	apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'war'
+
+	war {
+		baseName = 'scooby'
+		manifest {
+			attributes('Version': "${version}")
+		}
+	}
+
+	dependencies {
+		compile( project( ':featureA:api' ) )
+		compile( project( ':featureA:implementation' ) )
+		compile( project( ':featureB:api' ) )
+		compile( project( ':featureB:implementation' ) )
+	
+	    compile('org.springframework.boot:spring-boot-starter-web')
+	    testCompile('org.springframework.boot:spring-boot-starter-test')
+
+		providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    }
+}
+
+project(':featureA:implementation') {
+    dependencies {
+        compile( project(':featureA:api') )
+    }
+}
+
+project(':featureB:implementation') {
+    dependencies {
+        compile( project(':featureB:api') )
+    }
+}
